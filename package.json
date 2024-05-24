@@ -1,0 +1,22 @@
+{
+  "name": "project-wc-tool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "wc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ccwc": "node wc.js",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/wc.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
