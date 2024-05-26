@@ -59,11 +59,7 @@ function readFile(filePath, option, callback) {
       console.error(`Error reading file: ${err.message}`);
       return;
     }
-    if (option === "-c") {
-      callback(data, data.length);
-    } else {
-      callback(data.toString("utf8"), data.length);
-    }
+    processInput(data.toString(), option, filePath);
   });
 }
 
@@ -85,61 +81,50 @@ function readStdin(callback) {
   });
 }
 
+function processInput(data, option, filePath) {
+  const counts = countLinesWordsChars(data);
+  if (option === "-c") {
+    console.log(`${Buffer.byteLength(data, "utf8")} ${filePath || ""}`);
+  } else if (option === "-m") {
+    console.log(`${data.length} ${filePath || ""}`);
+  } else if (option === "-l") {
+    console.log(`${counts.lines} ${filePath || ""}`);
+  } else if (option === "-w") {
+    console.log(`${counts.words} ${filePath || ""}`);
+  } else {
+    console.log(
+      `${counts.lines} ${counts.words} ${Buffer.byteLength(data, "utf8")} ${
+        filePath || ""
+      }`
+    );
+  }
+}
+
 function countLinesWordsChars(text) {
-  const lines = text.split("\n").length;
+  const lines = text.split("\n").length - 1;
   const words = text.split(/\s+/).filter(Boolean).length;
   const chars = text.length;
   return { lines, words, chars };
 }
 
-function printCounts(option, counts, filePath = "") {
-  if (option === "-c") {
-    console.log(`${counts} ${filePath}`);
-  } else {
-    console.log(`${counts.lines} ${counts.words} ${counts.chars}`);
-  }
-}
-
-function processCommand(input) {
-  const args = input.trim().split(/\s+/);
-  const option = args[0]; // -c
+function processCommand(args) {
+  const option = args[0]; // -c, -m, -l, -w or file name
   const filePath = args[1]; // filename
 
   if (args.includes("-h") || args.includes("--help")) {
     showHelp();
-  } else if (args.length > 1 && option === "-c") {
-    readFile(filePath, option, (data, byteCount) => {
-      printCounts(option, byteCount, filePath);
-    });
-  } else if (args.length > 0) {
-    readFile(args[0], "", (data) => {
-      const counts = countLinesWordsChars(data);
-      printCounts("", counts);
-    });
+  } else if (filePath) {
+    readFile(filePath, option, processInput);
   } else {
     readStdin((data) => {
-      const counts = countLinesWordsChars(data);
-      printCounts("", counts);
+      processInput(data, option);
     });
   }
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: "ccwc> ",
-});
-
-rl.prompt();
-
-rl.on("line", (line) => {
-  if (line.trim() === "exit") {
-    rl.close();
-  } else {
-    processCommand(line);
-    rl.prompt();
-  }
-}).on("close", () => {
-  console.log("Goodbye!");
-  process.exit(0);
-});
+const args = process.argv.slice(2);
+if (args.length === 0) {
+  showHelp();
+} else {
+  processCommand(args);
+}

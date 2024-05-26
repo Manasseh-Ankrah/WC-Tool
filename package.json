@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "ccwc": "node wc.js",
     "start": "node dist/index.js",
-    "dev": "nodemon src/wc.ts"
+    "dev": " nodemon src/wc.ts"
   },
   "keywords": [],
   "author": "",

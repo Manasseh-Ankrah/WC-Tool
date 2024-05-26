@@ -1,5 +1,4 @@
-const fs = require("fs");
-const readline = require("readline");
+import readline from "readline";
 import { getBytes } from "./features/getBytes";
 import { getCharacters } from "./features/getCharacters";
 import { getLines } from "./features/getLines";
@@ -8,6 +7,48 @@ import { showHelp } from "./Intro";
 
 // let cmd = process.argv[2];
 // let filePath = process.argv[3];
+
+const executeCommands = (
+  preset: string,
+  cmd: string,
+  line: string,
+  filePath: string
+) => {
+  const cmdLength: number = line.split(" ").length;
+  const getValue: string[] = line.split(" ");
+
+  if (preset !== "ccwc" && cmdLength && cmd && filePath) {
+    console.log("*** Unknown Command ***");
+    process.exit(0);
+  }
+
+  if (preset === "ccwc" && cmdLength === 2) {
+    // console.log("*** RUNNING GET ALL Command ***");
+    console.log("====================================");
+    console.log("** line", line);
+    console.log("====================================");
+    console.log(getBytes(getValue[1]));
+    // console.log("newNumber from import", exe());
+  }
+
+  if (cmdLength === 3 && cmd == "-c") {
+    getBytes(filePath);
+  } else if (cmd == "-l") {
+    getLines(filePath);
+  } else if (cmd == "-w") {
+    getWords(filePath);
+  } else if (cmd == "-m") {
+    getCharacters(filePath);
+  } else {
+    return;
+    // console.log("====================================");
+    // console.log("Specify the correct command");
+    // console.log("====================================");
+  }
+
+  // function
+  // const commandList = ["-c", "-w", "-l", "-m"];
+};
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -19,43 +60,14 @@ rl.prompt();
 
 showHelp();
 rl.on("line", (line: string) => {
-  const LENGTH = line.split(" ").length;
-  let preset: string = LENGTH === 2 ? line?.split(" ")[0] : "ccwc";
-  let cmd: string = LENGTH === 2 ? "" : line?.split(" ")[1];
-  let filePath: string =
-    LENGTH === 2 ? line?.split(" ")[1] : line?.split(" ")[2];
+  let preset: string = line?.split(" ")[0];
+  let cmd: string = line?.split(" ")[1];
+  let filePath: string = line?.split(" ")[2];
 
   if (line.trim() === "exit") {
     rl.close();
   } else {
-    if (preset !== "ccwc") {
-      console.log("ccwc should be at the start of the command");
-    }
-
-    const commandList = ["-c", "-w", "-l", "-m"];
-
-    if (cmd == "-c") {
-      getBytes(filePath);
-    } else if (cmd == "-l") {
-      getLines(filePath);
-    } else if (cmd == "-w") {
-      getWords(filePath);
-    } else if (cmd == "-m") {
-      getCharacters(filePath);
-    } else {
-      if (filePath && commandList.includes(cmd) == false) {
-        // const bytes = getBytes(filePath);
-        // console.log("bytes =>>", bytes);
-        // getAllvalues(bytes, filePath);
-      } else {
-        console.log("filePath =>", filePath);
-        console.log("CMD =>", cmd);
-        console.log("CMD =>", commandList.includes(cmd) == false);
-        console.log("====================================");
-        console.log("Specify the correct command");
-        console.log("====================================");
-      }
-    }
+    executeCommands(preset, cmd, line, filePath);
     if (process.argv.includes("-h") || process.argv.includes("--help")) {
       showHelp();
     }

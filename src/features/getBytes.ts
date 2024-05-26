@@ -4,21 +4,20 @@ type StatProps = {
   size: number;
 };
 
-export const getBytes = async (filePath: string): Promise<number> => {
-  let value: number = 0;
+export const getBytes = async (filePath: string) => {
   fs.stat(`./src/${filePath}`, (err: string, stats: StatProps) => {
+    let value: number = 0;
     if (err) {
       console.error(err);
       return;
     }
 
-    console.log(stats.size + " " + filePath);
     value = stats.size;
+    console.log(stats.size + " " + filePath);
+    // console.log("====================================");
+    // console.log("value =>>", value);
+    // console.log("====================================");
   });
 
-  console.log("====================================");
-  console.log("value =>>", value);
-  console.log("====================================");
-
-  return value;
+  // return value;
 };
